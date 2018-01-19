@@ -1,5 +1,5 @@
 {
-    "name": "shutterstock/media_webdam",
+    "name": "webdam/media_webdam",
     "description": "Integrates the Drupal 8 Media ecosystem with Webdam.",
     "authors": [
         {
