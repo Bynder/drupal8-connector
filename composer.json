@@ -20,7 +20,7 @@
         }
     ],
     "type": "drupal-module",
-    "license": "GPL-2.0+",
+    "license": "GPL-2.0-or-later",
     "require": {
         "cweagans/php-webdam-client": "dev-master",
         "drupal/entity_browser": "2.x-dev",
