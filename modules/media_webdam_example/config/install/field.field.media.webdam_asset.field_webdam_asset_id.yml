@@ -1,0 +1,22 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_webdam_asset_id
+    - media.type.webdam_asset
+id: media.webdam_asset.field_webdam_asset_id
+field_name: field_webdam_asset_id
+entity_type: media
+bundle: webdam_asset
+label: 'Asset ID'
+description: 'The numeric asset ID provided by Webdam.'
+required: true
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  min: 0
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

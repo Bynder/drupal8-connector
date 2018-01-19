@@ -1,0 +1,35 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.media.thumbnail
+    - field.field.media.webdam_asset.field_webdam_asset_descrip
+    - field.field.media.webdam_asset.field_webdam_asset_file
+    - field.field.media.webdam_asset.field_webdam_asset_id
+    - field.field.media.webdam_asset.field_media_in_library
+    - image.style.medium
+    - media.type.webdam_asset
+  module:
+    - image
+id: media.webdam_asset.thumbnail
+targetEntityType: media
+bundle: webdam_asset
+mode: thumbnail
+content:
+  thumbnail:
+    type: image
+    weight: 0
+    label: hidden
+    settings:
+      image_style: medium
+      image_link: ''
+    region: content
+    third_party_settings: {  }
+hidden:
+  created: true
+  field_webdam_asset_descrip: true
+  field_webdam_asset_file: true
+  field_webdam_asset_id: true
+  field_media_in_library: true
+  name: true
+  uid: true

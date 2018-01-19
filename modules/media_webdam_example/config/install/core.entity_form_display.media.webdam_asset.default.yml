@@ -1,0 +1,28 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.media.webdam_asset.field_webdam_asset_descrip
+    - field.field.media.webdam_asset.field_webdam_asset_file
+    - field.field.media.webdam_asset.field_webdam_asset_id
+    - field.field.media.webdam_asset.field_media_in_library
+    - media.type.webdam_asset
+id: media.webdam_asset.default
+targetEntityType: media
+bundle: webdam_asset
+mode: default
+content:
+  field_webdam_asset_id:
+    weight: 0
+    settings:
+      placeholder: ''
+    third_party_settings: {  }
+    type: number
+    region: content
+hidden:
+  created: true
+  field_webdam_asset_descrip: true
+  field_webdam_asset_file: true
+  field_media_in_library: true
+  name: true
+  uid: true

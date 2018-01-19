@@ -1,0 +1,5 @@
+username:
+password:
+client_id:
+secret:
+sync_interval: '3600'

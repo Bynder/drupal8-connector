@@ -1,0 +1,13 @@
+diff --git a/README.md b/README.md
+index 7968569..3fda68a 100644
+--- a/README.md
++++ b/README.md
+@@ -88,7 +88,7 @@ Download and install the media_webdam module and all dependencies.  [See here
+ - The [Crop](https://www.drupal.org/project/crop) and Entity Browser IEF modules are recommended for increased functionality
+ 
+ ### Configure Webdam API credentials and Cron settings
+-You webdam API credentials and Cron settings should be configured at /admin/media/config/webdam.  This module uses cron to periodically synchronize the mapped media entity field values with webdam.  The synchronize interval will be dependent on how often your site is configured to run cron.
++Your webdam API credentials and Cron settings should be configured at /admin/config/media/webdam.  This module uses cron to periodically synchronize the mapped media entity field values with webdam.  The synchronize interval will be dependent on how often your site is configured to run cron.
+ 
+ - NOTE: The Password and Client Secret fields will appear blank after saving.
+ 

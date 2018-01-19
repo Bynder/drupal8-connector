@@ -1,0 +1,6 @@
+media_webdam.config:
+  title: 'Webdam'
+  description: 'Configure Webdam access credentials.'
+  route_name: media_webdam.config
+  menu_name: admin
+  parent: system.admin_config_media

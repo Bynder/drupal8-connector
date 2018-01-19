@@ -1,0 +1,78 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.media.embedded
+    - field.field.media.webdam_asset.field_webdam_asset_descrip
+    - field.field.media.webdam_asset.field_webdam_asset_file
+    - field.field.media.webdam_asset.field_webdam_asset_id
+    - field.field.media.webdam_asset.field_media_in_library
+    - media.type.webdam_asset
+  module:
+    - fallback_formatter
+id: media.webdam_asset.embedded
+targetEntityType: media
+bundle: webdam_asset
+mode: embedded
+content:
+  field_webdam_asset_file:
+    weight: 0
+    label: hidden
+    settings:
+      formatters:
+        file_default:
+          status: true
+          weight: -49
+          formatter: file_default
+        file_rss_enclosure:
+          status: false
+          weight: -48
+          formatter: file_rss_enclosure
+        file_url_plain:
+          status: false
+          weight: -47
+          formatter: file_url_plain
+        file_table:
+          status: false
+          weight: -46
+          formatter: file_table
+        image:
+          status: true
+          weight: -50
+          settings:
+            image_style: medium
+            image_link: ''
+          formatter: image
+        image_url:
+          status: false
+          weight: -45
+          settings:
+            image_style: ''
+          formatter: image_url
+        entity_reference_entity_view:
+          status: false
+          weight: -44
+          settings:
+            view_mode: default
+          formatter: entity_reference_entity_view
+        entity_reference_entity_id:
+          status: false
+          weight: -43
+          formatter: entity_reference_entity_id
+        entity_reference_label:
+          status: false
+          weight: -42
+          settings:
+            link: true
+          formatter: entity_reference_label
+    third_party_settings: {  }
+    type: fallback
+    region: content
+hidden:
+  created: true
+  field_webdam_asset_descrip: true
+  field_webdam_asset_id: true
+  field_media_in_library: true
+  name: true
+  thumbnail: true
+  uid: true

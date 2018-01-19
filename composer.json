@@ -1,0 +1,34 @@
+{
+    "name": "shutterstock/media_webdam",
+    "description": "Integrates the Drupal 8 Media ecosystem with Webdam.",
+    "authors": [
+        {
+            "name": "Webdam",
+            "email": "contact@webdam.com",
+            "homepage": "http://www.webdam.com"
+        },
+        {
+            "name": "Mobomo",
+            "email": "sales@mobomo.com",
+            "homepage": "https://www.mobomo.com"
+        }
+    ],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
+        }
+    ],
+    "type": "drupal-module",
+    "license": "GPL-2.0+",
+    "require": {
+        "cweagans/php-webdam-client": "dev-master"
+    },
+    "extra": {
+        "patches": {
+            "drupal/core": {
+                "#2241865: Do not create a new file entity to overwrite an existing entity": "https://www.drupal.org/files/issues/2241865-50.patch"
+            }
+        }
+    }
+}

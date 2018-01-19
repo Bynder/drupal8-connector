@@ -1,0 +1,13 @@
+.asset-preview {
+  width: 60%;
+  float: left;
+  display: inline-block;
+  min-width: 200px;
+}
+
+.asset-data {
+  width: 40%;
+  float: left;
+  display: inline-block;
+  min-width: 200px;
+}

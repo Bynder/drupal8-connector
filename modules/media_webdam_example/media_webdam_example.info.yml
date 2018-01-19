@@ -1,0 +1,10 @@
+name: "Media: Webdam - Example Configuration"
+description: "Example configuration of the Media: Webdam module."
+core: 8.x
+type: module
+package: Media
+dependencies:
+  - media_webdam
+  - file
+  - image
+  - fallback_formatter

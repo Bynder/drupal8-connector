@@ -1,0 +1,43 @@
+media_webdam.config:
+  path: '/admin/config/media/webdam'
+  defaults:
+    _form: '\Drupal\media_webdam\Form\WebdamConfig'
+    _title: 'Webdam Configuration'
+  requirements:
+    _permission: 'administer site configuration'
+
+entity.user.webdam_auth:
+  path: '/user/{user}/webdam'
+  defaults:
+    _title: 'Webdam'
+    _controller: '\Drupal\media_webdam\Controller\OauthController::authPage'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    user: \d+
+
+media_webdam.auth_start:
+  path: '/webdam/authStart'
+  defaults:
+    _title: 'Redirect to DAM'
+    _controller: '\Drupal\media_webdam\Controller\OauthController::authStart'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+  options:
+    no_cache: 'TRUE'
+
+media_webdam.auth_finish:
+  path: '/webdam/authFinish'
+  defaults:
+    _title: 'Authentication finalization'
+    _controller: '\Drupal\media_webdam\Controller\OauthController::authFinish'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+
+media_webdam.asset_details:
+  path: 'webdam/asset/{assetId}'
+  defaults:
+    _controller: '\Drupal\media_webdam\Controller\WebdamController:assetDetailsPage'
+    _title_callback: '\Drupal\media_webdam\Controller\WebdamController:assetDetailsPageTitle'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    assetId: \d+

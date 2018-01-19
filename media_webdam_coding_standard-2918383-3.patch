@@ -1,0 +1,689 @@
+diff --git a/media_webdam.links.menu.yml b/media_webdam.links.menu.yml
+index 2c4f783..c734bf2 100644
+--- a/media_webdam.links.menu.yml
++++ b/media_webdam.links.menu.yml
+@@ -4,4 +4,3 @@ media_webdam.config:
+   route_name: media_webdam.config
+   menu_name: admin
+   parent: system.admin_config_media
+-
+diff --git a/media_webdam.module b/media_webdam.module
+index c527ca0..3f6bebb 100644
+--- a/media_webdam.module
++++ b/media_webdam.module
+@@ -69,7 +69,7 @@ function media_webdam_menu_local_tasks_alter(&$data, $route_name) {
+ /**
+  * Implements hook_preprocess_HOOK().
+  *
+- * Allow custom markup for webdam asset checkboxes
++ * Allow custom markup for webdam asset checkboxes.
+  */
+ function media_webdam_preprocess_checkboxes__webdam_assets(&$variables) {
+   $element = $variables['element'];
+@@ -85,16 +85,15 @@ function media_webdam_preprocess_checkboxes__webdam_assets(&$variables) {
+  * Override the preSave function from \Drupal\media\Entity\Media
+  * because it ignores empty values (e.g. status = 0) and doesn't set date values
+  * for created/changed because the are already set by Drupal core
+- *
+  */
+ function media_webdam_media_presave($entity) {
+-  //Download and set the thumbnail image
++  // Download and set the thumbnail image.
+   $entity->updateQueuedThumbnail();
+-  //Loop through the mapped fields
++  // Loop through the mapped fields.
+   foreach ($entity->bundle->entity->getFieldMap() as $source_field => $destination_field) {
+-    //If the entity has the mapped destination field
++    // If the entity has the mapped destination field.
+     if ($entity->hasField($destination_field)) {
+-      //Set the value of the mapped field to the asset value
++      // Set the value of the mapped field to the asset value.
+       $entity->set($destination_field, $entity->getSource()->getMetadata($entity, $source_field));
+     }
+   }
+@@ -103,9 +102,9 @@ function media_webdam_media_presave($entity) {
+ /**
+  * Implements hook_cron().
+  *
+- * Refresh webdam metadata and sync to media entities
++ * Refresh webdam metadata and sync to media entities.
+  */
+-function media_webdam_cron(){
++function media_webdam_cron() {
+   // We access our configuration.
+   $cron_config = \Drupal::configFactory()->getEditable('media_webdam.settings');
+   // Default to an hourly interval. Of course, cron has to be running at least
+@@ -118,25 +117,25 @@ function media_webdam_cron(){
+   $next_execution = !empty($next_execution) ? $next_execution : 0;
+   $request_time = \Drupal::time()->getRequestTime();
+   if ($request_time >= $next_execution) {
+-    //Load all media bundles
++    // Load all media bundles.
+     $media_bundles = \Drupal::entityTypeManager()->getStorage('media_type')->loadMultiple();
+-    //Filter out bundles that do not have type = webdam_asset
+-    $webdam_bundles = array_map( function($item){
++    // Filter out bundles that do not have type = webdam_asset.
++    $webdam_bundles = array_map(function ($item) {
+       return $item->label;
+-    },array_filter($media_bundles, function($item){
++    }, array_filter($media_bundles, function ($item) {
+         return $item->type == 'webdam_asset';
+-      })
++    })
+     );
+-    //fetch all webdam asset entity ID's
++    // Fetch all webdam asset entity ID's.
+     $all_ids = \Drupal::entityQuery('media')
+-      ->condition('bundle',array_keys($webdam_bundles), 'IN')
++      ->condition('bundle', array_keys($webdam_bundles), 'IN')
+       ->execute();
+ 
+     foreach ($all_ids as $id) {
+       \Drupal::queue('media_webdam_asset_refresh')->createItem(['id' => $id]);
+     }
+ 
+-    //Set the next execution time
++    // Set the next execution time.
+     \Drupal::state()->set('media_webdam.next_sync', $request_time + $interval);
+   }
+ }
+diff --git a/src/Webdam.php b/src/Webdam.php
+index 0082448..cba84f1 100644
+--- a/src/Webdam.php
++++ b/src/Webdam.php
+@@ -60,7 +60,7 @@ class Webdam implements WebdamInterface {
+    * {@inheritdoc}
+    */
+   public function __call($name, $arguments) {
+-    $method_variable = array($this->client, $name);
++    $method_variable = [$this->client, $name];
+     if (is_callable($method_variable)) {
+       return call_user_func_array($method_variable, $arguments);
+     }
+diff --git a/src/WebdamInterface.php b/src/WebdamInterface.php
+index a945239..b64b3c9 100644
+--- a/src/WebdamInterface.php
++++ b/src/WebdamInterface.php
+@@ -3,7 +3,7 @@
+ namespace Drupal\media_webdam;
+ 
+ /**
+- * Interface WebdamInterface
++ * Interface WebdamInterface.
+  *
+  * @package Drupal\media_webdam
+  */
+diff --git a/src/ClientFactory.php b/src/ClientFactory.php
+index 204ee5c..5ac8f29 100644
+--- a/src/ClientFactory.php
++++ b/src/ClientFactory.php
+@@ -32,26 +32,27 @@ class ClientFactory {
+   /**
+    * A user data object to retrieve API keys from.
+    *
+-   * @var UserDataInterface
++   * @var \Drupal\user\UserDataInterface
+    */
+   protected $userData;
+ 
+   /**
+    * The current user.
+    *
+-   * @var AccountProxyInterface
++   * @var \Drupal\Core\Session\AccountProxyInterface
+    */
+   protected $currentUser;
+ 
+   /**
+    * ClientFactory constructor.
+-   * @param ConfigFactoryInterface $config_factory
++   *
++   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+    *   A config object to retrieve Webdam auth information from.
+-   * @param ClientInterface $gclient
++   * @param \cweagans\webdam\ClientInterface $gclient
+    *   A fully configured Guzzle client to pass to the dam client.
+-   * @param UserDataInterface $user_data
++   * @param \Drupal\user\UserDataInterface $user_data
+    *   A userdata object to retreive user-specific creds from.
+-   * @param AccountProxyInterface $currentUser
++   * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
+    *   The currently authenticated user.
+    */
+   public function __construct(ConfigFactoryInterface $config_factory, ClientInterface $gclient, UserDataInterface $user_data, AccountProxyInterface $currentUser) {
+diff --git a/src/Controller/OauthController.php b/src/Controller/OauthController.php
+index 23d4728..b08e364 100644
+--- a/src/Controller/OauthController.php
++++ b/src/Controller/OauthController.php
+@@ -37,7 +37,7 @@ class OauthController extends ControllerBase {
+   /**
+    * The media_webdam oauth service.
+    *
+-   * @var OauthInterface $oauth
++   * @var \Drupal\media_webdam\OauthInterface
+    */
+   protected $oauth;
+ 
+@@ -79,7 +79,7 @@ class OauthController extends ControllerBase {
+    *
+    * Route: /user/{$user}/webdam.
+    *
+-   * @param UserInterface $user
++   * @param \Drupal\user\UserInterface $user
+    *   The User object.
+    *
+    * @return array
+diff --git a/src/Form/WebdamConfig.php b/src/Form/WebdamConfig.php
+index 9a4e394..87dd692 100644
+--- a/src/Form/WebdamConfig.php
++++ b/src/Form/WebdamConfig.php
+@@ -5,7 +5,6 @@ namespace Drupal\media_webdam\Form;
+ use Drupal\Core\Form\ConfigFormBase;
+ use Drupal\Core\Form\FormStateInterface;
+ use Drupal\Core\Config\ConfigFactoryInterface;
+-use Drupal\media_webdam\Webdam;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
+ use cweagans\webdam\Exception\InvalidCredentialsException;
+ use GuzzleHttp\ClientInterface;
+diff --git a/src/Plugin/EntityBrowser/Widget/Webdam.php b/src/Plugin/EntityBrowser/Widget/Webdam.php
+index 7d42986..1fc5bb9 100644
+--- a/src/Plugin/EntityBrowser/Widget/Webdam.php
++++ b/src/Plugin/EntityBrowser/Widget/Webdam.php
+@@ -11,12 +11,10 @@ use Drupal\Core\Session\AccountInterface;
+ use Drupal\Core\Url;
+ use Drupal\entity_browser\WidgetBase;
+ use Drupal\entity_browser\WidgetValidationManager;
+-use Drupal\media\Entity\MediaType;
+ use Drupal\media\MediaSourceManager;
+ use Drupal\media_webdam\WebdamInterface;
+ use Symfony\Component\DependencyInjection\ContainerInterface;
+ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+-use Drupal\media\Entity\Media;
+ use Drupal\Core\Language\LanguageManagerInterface;
+ use Drupal\Core\Extension\ModuleHandlerInterface;
+ 
+@@ -41,14 +39,14 @@ class Webdam extends WidgetBase {
+   /**
+    * The current user account.
+    *
+-   * @var AccountInterface
++   * @var \Drupal\Core\Session\AccountInterface
+    */
+   protected $user;
+ 
+   /**
+    * The current user account.
+    *
+-   * @var LanguageManagerInterface
++   * @var \Drupal\Core\Language\LanguageManagerInterface
+    */
+   protected $languageManager;
+ 
+@@ -87,8 +85,8 @@ class Webdam extends WidgetBase {
+    *   The user account for which to get the permissions hash.
+    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
+    *   The language manager service.
+-   * @param ModuleHandlerInterface $moduleHandler
+-   * @param MediaSourceManager $sourceManager
++   * @param \Drupal\Core\Extension\ModuleHandlerInterface $moduleHandler
++   * @param \Drupal\media\MediaSourceManager $sourceManager
+    */
+   public function __construct(
+     array $configuration,
+@@ -458,22 +456,22 @@ class Webdam extends WidgetBase {
+         // Reset page to zero.
+         $page = 0;
+       }
+-      //If the reset submit button has been clicked
++      // If the reset submit button has been clicked.
+       if ($trigger_elem['#name'] == 'filter_sort_reset') {
+-        //Fetch the user input.
++        // Fetch the user input.
+         $user_input = $form_state->getUserInput();
+-        //Fetch clean values keys (system related, not user input).
++        // Fetch clean values keys (system related, not user input).
+         $clean_val_key = $form_state->getCleanValueKeys();
+-        //Loop through user inputs
++        // Loop through user inputs.
+         foreach ($user_input as $key => $item) {
+-          //Unset only the User Input values.
++          // Unset only the User Input values.
+           if (!in_array($key, $clean_val_key)) {
+             unset($user_input[$key]);
+           }
+         }
+         // Reset the user input.
+         $form_state->setUserInput($user_input);
+-        //Set values to user input.
++        // Set values to user input.
+         $form_state->setValues($user_input);
+         // Rebuild the form state values.
+         $form_state->setRebuild();
+@@ -544,7 +542,6 @@ class Webdam extends WidgetBase {
+     // Get module path to create URL for background images.
+     $modulePath = $this->moduleHandler->getModule('media_webdam')->getPath();
+ 
+-
+     // Add folder buttons to form.
+     foreach ($folders as $folder) {
+       $form['asset-container'][$folder->name] = [
+@@ -713,9 +710,9 @@ class Webdam extends WidgetBase {
+    */
+   public function defaultConfiguration() {
+     return [
+-        'media_type' => NULL,
+-        'submit_text' => $this->t('Select assets'),
+-      ] + parent::defaultConfiguration();
++      'media_type' => NULL,
++      'submit_text' => $this->t('Select assets'),
++    ] + parent::defaultConfiguration();
+   }
+ 
+   /**
+diff --git a/src/Plugin/QueueWorker/AssetRefresh.php b/src/Plugin/QueueWorker/AssetRefresh.php
+index 3b76add..9b437ae 100644
+--- a/src/Plugin/QueueWorker/AssetRefresh.php
++++ b/src/Plugin/QueueWorker/AssetRefresh.php
+@@ -1,10 +1,5 @@
+ <?php
+ 
+-/**
+- * @file
+- * Contains \Drupal\media_webdam\Plugin\QueueWorker\AssetRefresh.
+- */
+-
+ namespace Drupal\media_webdam\Plugin\QueueWorker;
+ 
+ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
+@@ -53,4 +48,5 @@ class AssetRefresh extends QueueWorkerBase implements ContainerFactoryPluginInte
+     // Save the entity to repopulate mapped fields.
+     $entity->save();
+   }
++
+ }
+diff --git a/src/Plugin/media/Source/WebdamAsset.php b/src/Plugin/media/Source/WebdamAsset.php
+index a4e44de..11c6657 100644
+--- a/src/Plugin/media/Source/WebdamAsset.php
++++ b/src/Plugin/media/Source/WebdamAsset.php
+@@ -6,7 +6,6 @@ use Drupal\Core\Config\ConfigFactoryInterface;
+ use Drupal\Core\Entity\EntityFieldManagerInterface;
+ use Drupal\Core\Entity\EntityTypeManagerInterface;
+ use Drupal\Core\Field\FieldTypePluginManagerInterface;
+-use Drupal\Core\Form\FormStateInterface;
+ use Drupal\file\FileInterface;
+ use Drupal\image\Entity\ImageStyle;
+ use Drupal\media\MediaInterface;
+@@ -30,7 +29,7 @@ class WebdamAsset extends MediaSourceBase {
+   /**
+    * A configured API object.
+    *
+-   * @var \Drupal\media_webdam\Webdam $webdam
++   * @var \Drupal\media_webdam\Webdam
+    */
+   protected $webdam;
+ 
+@@ -253,7 +252,7 @@ class WebdamAsset extends MediaSourceBase {
+             $styles = ImageStyle::loadMultiple();
+             // For each image style.
+             foreach ($styles as $style) {
+-              /** @var ImageStyle $style */
++              /** @var \Drupal\image\Entity\ImageStyle $style */
+               // Flush and regenerate the styled image.
+               $style->flush($file->getFileUri());
+             }
+diff --git a/tests/src/unit/WebdamAssetPluginTest.php b/tests/src/unit/WebdamAssetPluginTest.php
+index 8f06b74..a06b8ac 100644
+--- a/tests/src/unit/WebdamAssetPluginTest.php
++++ b/tests/src/unit/WebdamAssetPluginTest.php
+@@ -19,7 +19,7 @@ use Drupal\media_webdam\Webdam;
+ use Drupal\Tests\UnitTestCase;
+ 
+ /**
+- * asset plugin test.
++ * Asset plugin test.
+  *
+  * @group media_webdam
+  */
+@@ -29,16 +29,15 @@ class WebdamAssetPluginTest extends UnitTestCase {
+    * Tests the buildConfigurationForm method.
+    */
+   public function testBuildConfigurationForm() {
+-//    $field = $this->getMockBuilder(FieldStorageDefinition::class)
+-//      ->disableOriginalConstructor()
+-//      ->getMock();
+-//
+-//    $field->method('getType')
+-//      ->willReturn($this->returnValue('integer'));
+-//
+-//    $field->method('getLabel')
+-//      ->willReturn($this->returnValue('Test field'));
+-
++    // $field = $this->getMockBuilder(FieldStorageDefinition::class)
++    //      ->disableOriginalConstructor()
++    //      ->getMock();
++    //
++    //    $field->method('getType')
++    //      ->willReturn($this->returnValue('integer'));
++    //
++    //    $field->method('getLabel')
++    //      ->willReturn($this->returnValue('Test field'));.
+     $field_storage = $this->getMockBuilder(FieldStorageDefinition::class)
+       ->disableOriginalConstructor()
+       ->getMock();
+@@ -120,24 +119,55 @@ class WebdamAssetPluginTest extends UnitTestCase {
+ /**
+  * Testing stubs.
+  */
+-
+ class FieldDefinitionStub extends BaseFieldDefinition {
++
++  /**
++   *
++   */
+   public function __construct() {}
++
++  /**
++   *
++   */
+   public function mainPropertyName() {
+     return 'value';
+   }
+-}
+ 
++}
++/**
++ *
++ */
+ class ItemListStub extends ItemList {
+   public $value;
+-  public function __construct($value) { $this->value = $value; }
++
++  /**
++   *
++   */
++  public function __construct($value) {
++    $this->value = $value;
++  }
++
++  /**
++   *
++   */
+   public function first() {
+     return new FieldDefinitionStub();
+   }
+-}
+ 
++}
++/**
++ *
++ */
+ class WebdamStub extends Webdam {
++
++  /**
++   *
++   */
+   public function __construct() {}
++
++  /**
++   *
++   */
+   public function getAsset($assetId) {
+     $asset = new Asset();
+     $asset->filename = "testfile.jpg";
+@@ -147,49 +177,90 @@ class WebdamStub extends Webdam {
+     $asset->folder->id = 12345;
+     return $asset;
+   }
+-}
+ 
++}
++/**
++ *
++ */
+ class FormStub implements FormInterface {
+   protected $entity;
++
++  /**
++   *
++   */
+   public function __construct($entity) {
+     $this->entity = $entity;
+   }
++
++  /**
++   *
++   */
+   public function getEntity() {
+     return $this->entity;
+   }
++
++  /**
++   *
++   */
+   public function getFormId() {}
++
++  /**
++   *
++   */
+   public function buildForm(array $form, FormStateInterface $form_state) {}
++
++  /**
++   *
++   */
+   public function validateForm(array &$form, FormStateInterface $form_state) {}
++
++  /**
++   *
++   */
+   public function submitForm(array &$form, FormStateInterface $form_state) {}
+ 
+ }
+-
++/**
++ *
++ */
+ class MediaStub extends Media {
+   protected $properties = [];
+   protected $sourceField;
+ 
++  /**
++   *
++   */
+   public function __construct(array $properties) {
+     $this->properties = $properties;
+     $source = isset($properties['source']) ? $properties['source'] : NULL;
+     $this->sourceField = new ItemListStub($source);
+   }
+ 
++  /**
++   *
++   */
+   public function hasField($name) {
+     if ($name == 'source') {
+-      return true;
++      return TRUE;
+     }
+     return isset($properties[$name]);
+   }
+ 
++  /**
++   *
++   */
+   public function id() {
+     return 'webdam_asset';
+   }
+ 
++  /**
++   *
++   */
+   public function &__get($name) {
+     if ($name == 'source') {
+       return $this->sourceField;
+     }
+     return $this->properties[$name];
+   }
+-}
+ 
++}
+diff --git a/tests/src/unit/WebdamClientFactoryTest.php b/tests/src/unit/WebdamClientFactoryTest.php
+index 53c0635..1c14c1d 100644
+--- a/tests/src/unit/WebdamClientFactoryTest.php
++++ b/tests/src/unit/WebdamClientFactoryTest.php
+@@ -9,12 +9,15 @@ use Drupal\user\UserDataInterface;
+ use GuzzleHttp\Client as GClient;
+ 
+ /**
+- * client factory test.
++ * Client factory test.
+  *
+  * @group media_webdam
+  */
+ class WebdamClientFactoryTest extends UnitTestCase {
+ 
++  /**
++   *
++   */
+   public function testFactory() {
+     $config_factory = $this->getConfigFactoryStub([
+       'media_webdam.settings' => [
+@@ -22,7 +25,7 @@ class WebdamClientFactoryTest extends UnitTestCase {
+         'password' => 'WDpassword',
+         'client_id' => 'WDclient-id',
+         'secret' => 'WDsecret',
+-      ]
++      ],
+     ]);
+     $guzzle_client = new GClient();
+     $client_factory = new ClientFactory($config_factory, $guzzle_client, $this->getMock(UserDataInterface::class), $this->getMock(AccountProxy::class));
+diff --git a/tests/src/unit/WebdamConfigFormTest.php b/tests/src/unit/WebdamConfigFormTest.php
+index caf28f7..afd81bd 100644
+--- a/tests/src/unit/WebdamConfigFormTest.php
++++ b/tests/src/unit/WebdamConfigFormTest.php
+@@ -9,16 +9,13 @@ use Drupal\Core\Form\FormState;
+ use Drupal\media_webdam\Form\WebdamConfig;
+ use Drupal\Tests\UnitTestCase;
+ use GuzzleHttp\Handler\MockHandler;
+-use Drupal\media_webdam\Webdam;
+-use GuzzleHttp\ClientInterface;
+ use GuzzleHttp\Client;
+ use GuzzleHttp\HandlerStack;
+ use GuzzleHttp\Psr7\Response;
+ use cweagans\webdam\Client as WebdamClient;
+-use cweagans\webdam\Exception\InvalidCredentialsException;
+ 
+ /**
+- * config form test.
++ * Config form test.
+  *
+  * @group media_webdam
+  */
+@@ -181,31 +178,69 @@ class WebdamConfigFormTest extends UnitTestCase {
+   //    $this->assertEquals('webdam_pw', $config_stub->get('password'));
+   //    $this->assertEquals('webdam_client_id', $config_stub->get('client_id'));
+   //    $this->assertEquals('webdam_client_secret', $config_stub->get('secret'));
+-  //  }
++  /**
++ * }.
++ */
+ }
+-
++/**
++ *
++ */
+ class FormConfigFactoryStub extends ConfigFactory {
+   protected $configs = [];
++
++  /**
++   *
++   */
+   public function __construct() {}
++
++  /**
++   *
++   */
+   public function get($name) {
+     return $this->configs[$name];
+   }
++
++  /**
++   *
++   */
+   public function getEditable($name) {
+     return $this->configs[$name];
+   }
++
++  /**
++   *
++   */
+   public function set($name, $config) {
+     $this->configs[$name] = $config;
+   }
+ 
+ }
+-
++/**
++ *
++ */
+ class FormConfigStub extends Config {
+   protected $data = [];
++
++  /**
++   *
++   */
+   public function __construct() {}
++
++  /**
++   *
++   */
+   public function save($has_trusted_data = FALSE) {}
++
++  /**
++   *
++   */
+   public function set($key, $value) {
+     $this->data[$key] = $value;
+   }
++
++  /**
++   *
++   */
+   public function get($key = '') {
+     return $this->data[$key];
+   }
+diff --git a/tests/src/unit/WebdamServiceTest.php b/tests/src/unit/WebdamServiceTest.php
+index 0d66b4f..96967f6 100644
+--- a/tests/src/unit/WebdamServiceTest.php
++++ b/tests/src/unit/WebdamServiceTest.php
+@@ -10,13 +10,15 @@ use Drupal\user\UserDataInterface;
+ use GuzzleHttp\Client as GClient;
+ 
+ /**
+- * service test
++ * Service test.
+  *
+  * @group media_webdam
+  */
+ class WebdamServiceTest extends UnitTestCase {
+ 
+-  // Saves some typing.
++  /**
++   * Saves some typing.
++   */
+   public function getConfigFactoryStub(array $configs = []) {
+     return parent::getConfigFactoryStub([
+       'media_webdam.settings' => [
+@@ -24,10 +26,13 @@ class WebdamServiceTest extends UnitTestCase {
+         'password' => 'WDpassword',
+         'client_id' => 'WDclient-id',
+         'secret' => 'WDsecret',
+-      ]
++      ],
+     ]);
+   }
+ 
++  /**
++   *
++   */
+   public function testConstructor() {
+     $client_factory = new ClientFactory($this->getConfigFactoryStub(), new GClient(), $this->getMock(UserDataInterface::class), $this->getMock(AccountProxy::class));
+     $webdam = new Webdam($client_factory, 'background');

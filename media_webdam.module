@@ -1,0 +1,141 @@
+<?php
+
+/**
+ * @file
+ * Integrates Drupal with Webdam.
+ */
+
+/**
+ * Implements hook_theme().
+ */
+function media_webdam_theme($existing, $type, $theme, $path) {
+  return [
+    'asset_details' => [
+      'variables' => [
+        'asset_data' => [],
+        'asset_preview' => NULL,
+        'asset_link' => NULL,
+      ],
+    ],
+    'checkboxes__webdam_assets' => [
+      'render element' => 'element',
+      'template' => 'checkboxes--webdam-assets',
+    ],
+    'asset_browser_message' => [
+      'variables' => [
+        'message' => [],
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ */
+function media_webdam_field_formatter_info_alter(&$info) {
+  // Allow using the image formatter on a file field.
+  if (isset($info['image']) && !in_array('file', $info['image']['field_types'])) {
+    $info['image']['field_types'][] = 'file';
+  }
+}
+
+/**
+ * Implements hook_entity_type_alter().
+ */
+function media_webdam_entity_type_alter(array &$entity_types) {
+  /** #var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
+  $entity_types['user']->setLinkTemplate('webdam-auth-form', '/user/{user}/webdam');
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ *
+ * Hides the 'Webdam' tab on the user profile if the user is not viewing their
+ * own profile.
+ */
+function media_webdam_menu_local_tasks_alter(&$data, $route_name) {
+  if ($route_name == 'entity.user.canonical') {
+    foreach ($data['tabs'][0] as $key => $link) {
+      if (
+        $link['#link']['url']->getRouteName() == 'entity.user.webdam_auth' &&
+        $link['#link']['url']->getRouteParameters()['user'] != \Drupal::currentUser()->id()
+      ) {
+        unset($data['tabs'][0][$key]);
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ *
+ * Allow custom markup for webdam asset checkboxes.
+ */
+function media_webdam_preprocess_checkboxes__webdam_assets(&$variables) {
+  $element = $variables['element'];
+  $variables['children'] = $element['#children'];
+  $variables['element']['#theme'] = 'checkboxes__webdam_assets';
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_presave().
+ *
+ * @var \Drupal\media\Entity\Media $entity
+ *
+ * Override the preSave function from \Drupal\media\Entity\Media
+ * because it ignores empty values (e.g. status = 0) and doesn't set date values
+ * for created/changed because the are already set by Drupal core
+ */
+function media_webdam_media_presave($entity) {
+  // Download and set the thumbnail image.
+  $entity->updateQueuedThumbnail();
+  // Loop through the mapped fields.
+  foreach ($entity->bundle->entity->getFieldMap() as $source_field => $destination_field) {
+    // If the entity has the mapped destination field.
+    if ($entity->hasField($destination_field)) {
+      // Set the value of the mapped field to the asset value.
+      $entity->set($destination_field, $entity->getSource()->getMetadata($entity, $source_field));
+    }
+  }
+}
+
+/**
+ * Implements hook_cron().
+ *
+ * Refresh webdam metadata and sync to media entities.
+ */
+function media_webdam_cron() {
+  // We access our configuration.
+  $cron_config = \Drupal::configFactory()->getEditable('media_webdam.settings');
+  // Default to an hourly interval. Of course, cron has to be running at least
+  // hourly for this to work.
+  $interval = $cron_config->get('sync_interval');
+  $interval = !empty($interval) ? $interval : 3600;
+  // We usually don't want to act every time cron runs (which could be every
+  // minute) so keep a time for the next run in the site state.
+  $next_execution = \Drupal::state()->get('media_webdam.next_sync');
+  $next_execution = !empty($next_execution) ? $next_execution : 0;
+  $request_time = \Drupal::time()->getRequestTime();
+  if ($request_time >= $next_execution) {
+    // Load all media bundles.
+    $media_bundles = \Drupal::entityTypeManager()->getStorage('media_type')->loadMultiple();
+    // Filter out bundles that do not have type = webdam_asset.
+    $webdam_bundles = array_map(function($item){
+      return $item->label();
+    }, array_filter($media_bundles, function ($item) {
+        return $item->getSource()->getPluginId() == 'webdam_asset';
+      })
+    );
+    // Fetch all webdam asset entity ID's.
+    $all_ids = \Drupal::entityQuery('media')
+      ->condition('bundle', array_keys($webdam_bundles), 'IN')
+      ->execute();
+
+    foreach ($all_ids as $id) {
+      \Drupal::queue('media_webdam_asset_refresh')->createItem(['id' => $id]);
+    }
+
+    // Set the next execution time.
+    \Drupal::state()->set('media_webdam.next_sync', $request_time + $interval);
+  }
+}

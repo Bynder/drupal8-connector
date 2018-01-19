@@ -1,0 +1,10 @@
+name: "Lightning: Webdam"
+description: "Integrates the Webdam module with Lightning."
+core: 8.x
+type: module
+package: Media
+dependencies:
+  - media_webdam
+  - file
+  - image
+  - fallback_formatter

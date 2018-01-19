@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - media_webdam
+id: webdam_asset
+label: 'Webdam Asset'
+description: 'An asset hosted on Webdam.'
+source: webdam_asset
+queue_thumbnail_downloads: false
+new_revision: true
+source_configuration:
+  source_field: field_webdam_asset_id
+field_map:
+  description: field_webdam_asset_descrip
+  file: field_webdam_asset_file
+  datecreated: created
+  datemodified: changed
+  status: status

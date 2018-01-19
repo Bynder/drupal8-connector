@@ -1,0 +1,13 @@
+services:
+  media_webdam.client_factory:
+    class: Drupal\media_webdam\ClientFactory
+    arguments: ['@config.factory', '@http_client', '@user.data', '@current_user']
+  media_webdam.webdam:
+    class: Drupal\media_webdam\Webdam
+    arguments: ['@media_webdam.client_factory', 'background']
+  media_webdam.webdam_user_creds:
+    class: Drupal\media_webdam\Webdam
+    arguments: ['@media_webdam.client_factory', 'current']
+  media_webdam.oauth:
+    class: Drupal\media_webdam\Oauth
+    arguments: ['@config.factory', '@csrf_token', '@url_generator.non_bubbling', '@http_client']

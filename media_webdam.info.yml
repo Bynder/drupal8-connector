@@ -1,0 +1,11 @@
+name: "Media: Webdam"
+description: "Integrates the Media module ecosystem with Webdam"
+core: 8.x
+type: module
+package: Media
+configure: media_webdam.config
+dependencies:
+  - drupal:media (>= 8.4)
+  - file
+  - image
+  - fallback_formatter

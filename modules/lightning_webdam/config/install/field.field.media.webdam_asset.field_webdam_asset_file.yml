@@ -1,0 +1,26 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.media.field_webdam_asset_file
+    - media.type.webdam_asset
+  module:
+    - file
+id: media.webdam_asset.field_webdam_asset_file
+field_name: field_webdam_asset_file
+entity_type: media
+bundle: webdam_asset
+label: 'Asset file'
+description: 'This field will hold the original file data that was uploaded to Webdam. '
+required: false
+translatable: false
+default_value: {  }
+default_value_callback: ''
+settings:
+  file_directory: webdam-assets
+  file_extensions: 'jpg gif png svg pdf doc docx ppt pptx xls xlsx txt mp4 mpg mpeg webm'
+  max_filesize: ''
+  description_field: false
+  handler: 'default:file'
+  handler_settings: {  }
+field_type: file
