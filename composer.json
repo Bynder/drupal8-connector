@@ -22,7 +22,10 @@
     "type": "drupal-module",
     "license": "GPL-2.0+",
     "require": {
-        "cweagans/php-webdam-client": "dev-master"
+        "cweagans/php-webdam-client": "dev-master",
+        "drupal/entity_browser": "2.x-dev",
+        "drupal/ctools": "^3.0",
+        "drupal/admin_toolbar": "^1.21"
     },
     "extra": {
         "patches": {
