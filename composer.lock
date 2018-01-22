@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "62ebf7664b1364c1b21634a0f851a5fe",
+    "content-hash": "5a8044ce3810caa00901b861795f55ae",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -988,6 +988,67 @@
                 "irc": "irc://irc.freenode.org/drupal-contribute"
             },
             "time": "2018-01-09T17:56:47+00:00"
+        },
+        {
+            "name": "drupal/fallback_formatter",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://git.drupal.org/project/fallback_formatter",
+                "reference": "8.x-1.0"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/fallback_formatter-8.x-1.0.zip",
+                "reference": "8.x-1.0",
+                "shasum": "65288e69133ef61262249a0b6d059f55c9baff58"
+            },
+            "require": {
+                "drupal/core": "~8.0"
+            },
+            "type": "drupal-module",
+            "extra": {
+                "branch-alias": {
+                    "dev-1.x": "1.x-dev"
+                },
+                "drupal": {
+                    "version": "8.x-1.0",
+                    "datestamp": "1468356839",
+                    "security-coverage": {
+                        "status": "covered",
+                        "message": "Covered by Drupal's security advisory policy"
+                    }
+                }
+            },
+            "notification-url": "https://packages.drupal.org/8/downloads",
+            "license": [
+                "GPL-2.0+"
+            ],
+            "authors": [
+                {
+                    "name": "Dave Reid",
+                    "homepage": "https://www.drupal.org/user/53892"
+                },
+                {
+                    "name": "Drupal Media Team",
+                    "homepage": "https://www.drupal.org/user/3260690"
+                },
+                {
+                    "name": "Drupal media CI",
+                    "homepage": "https://www.drupal.org/user/3057985"
+                },
+                {
+                    "name": "slashrsm",
+                    "homepage": "https://www.drupal.org/user/744628"
+                }
+            ],
+            "description": "Provides a field formatter that can attempt multiple formatters and the first one that returns output wins.",
+            "homepage": "https://www.drupal.org/project/fallback_formatter",
+            "support": {
+                "source": "http://cgit.drupalcode.org/fallback_formatter",
+                "issues": "https://www.drupal.org/project/issues/fallback_formatter",
+                "irc": "irc://irc.freenode.org/drupal-media"
+            }
         },
         {
             "name": "easyrdf/easyrdf",

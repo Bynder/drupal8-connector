@@ -25,7 +25,8 @@
         "cweagans/php-webdam-client": "dev-master",
         "drupal/entity_browser": "2.x-dev",
         "drupal/ctools": "^3.0",
-        "drupal/admin_toolbar": "^1.21"
+        "drupal/admin_toolbar": "^1.21",
+        "drupal/fallback_formatter": "^1.0"
     },
     "extra": {
         "patches": {
