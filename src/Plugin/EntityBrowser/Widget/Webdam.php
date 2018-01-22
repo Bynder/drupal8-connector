@@ -540,7 +540,8 @@ class Webdam extends WidgetBase {
     ];
 
     // Get module path to create URL for background images.
-    $modulePath = $this->moduleHandler->getModule('media_webdam')->getPath();
+    $basePath = base_path();
+    $modulePath = $basePath . $this->moduleHandler->getModule('media_webdam')->getPath();
 
     // If no search terms, display folders.
     if (empty($params['query'])) {
@@ -766,7 +767,8 @@ class Webdam extends WidgetBase {
    *   Element HTML markup.
    */
   public function layoutMediaEntity(Asset $webdamAsset) {
-    $modulePath = $this->moduleHandler->getModule('media_webdam')->getPath();
+    $basePath = base_path();
+    $modulePath = $basePath . $this->moduleHandler->getModule('media_webdam')->getPath();
 
     $assetName = $webdamAsset->name;
     if (!empty($webdamAsset->thumbnailurls)) {
@@ -775,7 +777,7 @@ class Webdam extends WidgetBase {
     else {
       $thumbnail = '<span class="webdam-browser-empty">No preview available.</span>';
     }
-    $element = '<div class="webdam-asset-checkbox">' . $thumbnail . '<div class="webdam-asset-details"><a href="/webdam/asset/' . $webdamAsset->id . '" class="use-ajax" data-dialog-type="modal"><img src="/' . $modulePath . '/img/ext-link.png" alt="Folder link" class="webdam-asset-browser-icon" /></a><p class="webdam-asset-filename">' . $assetName . '</p></div></div>';
+    $element = '<div class="webdam-asset-checkbox">' . $thumbnail . '<div class="webdam-asset-details"><a href="' . $basePath. 'webdam/asset/' . $webdamAsset->id . '" class="use-ajax" data-dialog-type="modal"><img src="' . $modulePath . '/img/ext-link.png" alt="Folder link" class="webdam-asset-browser-icon" /></a><p class="webdam-asset-filename">' . $assetName . '</p></div></div>';
     return $element;
   }
 
