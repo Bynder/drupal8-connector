@@ -552,7 +552,7 @@ class Webdam extends WidgetBase {
           '#type' => 'container',
           '#attributes' => [
             'class' => ['webdam-browser-folder-link'],
-            'style' => 'background-image:url("/' . $modulePath . '/img/folder.png")',
+            'style' => 'background-image:url("' . $modulePath . '/img/folder.png")',
           ],
         ];
         // Use folder thumbnail to generate inline style, if present.
