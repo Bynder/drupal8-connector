@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "content-hash": "de492e5fa0a12c836e3d0c6cc6cbafcf",
+    "content-hash": "ed80b1df571cc06bd1a3dc63e0c4bca1",
     "packages": [
         {
             "name": "asm89/stack-cors",
@@ -1056,11 +1056,17 @@
         },
         {
             "name": "drupal/entity_embed",
-            "version": "dev-1.x",
+            "version": "1.0.0-beta2",
             "source": {
                 "type": "git",
                 "url": "https://git.drupal.org/project/entity_embed",
-                "reference": "bdb4e9d83718c552ec52b2e82f62e19bd2250edc"
+                "reference": "8.x-1.0-beta2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://ftp.drupal.org/files/projects/entity_embed-8.x-1.0-beta2.zip",
+                "reference": "8.x-1.0-beta2",
+                "shasum": "21cdeb2b058efce461683aed9a8951053512dca7"
             },
             "require": {
                 "drupal/core": "*",
@@ -1075,11 +1081,11 @@
                     "dev-1.x": "1.x-dev"
                 },
                 "drupal": {
-                    "version": "8.x-1.0-beta2+2-dev",
-                    "datestamp": "1490756884",
+                    "version": "8.x-1.0-beta2",
+                    "datestamp": "1476698339",
                     "security-coverage": {
                         "status": "not-covered",
-                        "message": "Dev releases are not covered by Drupal security advisories."
+                        "message": "Beta releases are not covered by Drupal security advisories."
                     }
                 }
             },
@@ -1115,8 +1121,7 @@
                 "source": "http://cgit.drupalcode.org/entity_embed",
                 "issues": "https://www.drupal.org/project/issues/entity_embed",
                 "irc": "irc://irc.freenode.org/drupal-media"
-            },
-            "time": "2017-03-29T03:07:13+00:00"
+            }
         },
         {
             "name": "drupal/fallback_formatter",
@@ -3072,7 +3077,7 @@
     "stability-flags": {
         "cweagans/php-webdam-client": 20,
         "drupal/entity_browser": 20,
-        "drupal/entity_embed": 20
+        "drupal/entity_embed": 10
     },
     "prefer-stable": false,
     "prefer-lowest": false,
